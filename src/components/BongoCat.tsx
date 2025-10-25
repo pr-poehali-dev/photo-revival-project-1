@@ -7,7 +7,7 @@ interface Paw {
   side: 'left' | 'right' | 'top' | 'bottom';
 }
 
-interface Scratch {
+interface PawPrint {
   id: number;
   x: number;
   y: number;
@@ -16,7 +16,7 @@ interface Scratch {
 
 export default function BongoCat() {
   const [paws, setPaws] = useState<Paw[]>([]);
-  const [scratches, setScratches] = useState<Scratch[]>([]);
+  const [pawPrints, setPawPrints] = useState<PawPrint[]>([]);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -24,7 +24,7 @@ export default function BongoCat() {
       const randomSide = sides[Math.floor(Math.random() * sides.length)];
       
       const pawId = Date.now();
-      const scratchId = pawId + 1;
+      const printId = pawId + 1;
 
       let pawX = e.clientX;
       let pawY = e.clientY;
@@ -50,18 +50,22 @@ export default function BongoCat() {
 
       setPaws(prev => [...prev, { id: pawId, x: pawX, y: pawY, side: randomSide }]);
       
+      const rotation = Math.random() * 360;
+      setPawPrints(prev => [...prev, { id: printId, x: e.clientX, y: e.clientY, rotation }]);
+
       setTimeout(() => {
-        const rotation = Math.random() * 60 - 30;
-        setScratches(prev => [...prev, { id: scratchId, x: e.clientX, y: e.clientY, rotation }]);
-      }, 500);
+        const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTcIGWi77eefTRAMUKfj8LZjHAY4ktjzzHksBSR3yPDekEAKFV616OunVRQLSKDh8r9tIgUsgc7y2Yk3CBlou+3nn00QDFC');
+        audio.volume = 0.3;
+        audio.play().catch(() => {});
+      }, 1000);
 
       setTimeout(() => {
         setPaws(prev => prev.filter(p => p.id !== pawId));
       }, 2000);
 
       setTimeout(() => {
-        setScratches(prev => prev.filter(s => s.id !== scratchId));
-      }, 5000);
+        setPawPrints(prev => prev.filter(s => s.id !== printId));
+      }, 3000);
     };
 
     document.addEventListener('click', handleClick);
@@ -122,50 +126,29 @@ export default function BongoCat() {
         </div>
       ))}
 
-      {scratches.map(scratch => (
+      {pawPrints.map(print => (
         <div
-          key={scratch.id}
-          className="fixed pointer-events-none z-40 animate-fade-in"
+          key={print.id}
+          className="fixed pointer-events-none z-40"
           style={{
-            left: scratch.x,
-            top: scratch.y,
-            transform: `translate(-50%, -50%) rotate(${scratch.rotation}deg)`,
+            left: print.x,
+            top: print.y,
+            transform: `translate(-50%, -50%) rotate(${print.rotation}deg)`,
           }}
         >
-          <svg width="60" height="80" viewBox="0 0 60 80" fill="none">
-            <path
-              d="M 10 10 Q 12 40 10 70"
-              stroke="#9b87f5"
-              strokeWidth="3"
-              fill="none"
-              strokeLinecap="round"
-              opacity="0.4"
-            />
-            <path
-              d="M 25 5 Q 27 40 25 75"
-              stroke="#9b87f5"
-              strokeWidth="3"
-              fill="none"
-              strokeLinecap="round"
-              opacity="0.5"
-            />
-            <path
-              d="M 40 8 Q 42 40 40 72"
-              stroke="#9b87f5"
-              strokeWidth="3"
-              fill="none"
-              strokeLinecap="round"
-              opacity="0.4"
-            />
-            <path
-              d="M 50 15 Q 52 40 50 65"
-              stroke="#9b87f5"
-              strokeWidth="2"
-              fill="none"
-              strokeLinecap="round"
-              opacity="0.3"
-            />
-          </svg>
+          <div className="animate-paw-print">
+            <svg width="50" height="50" viewBox="0 0 100 100" fill="none">
+              <ellipse cx="50" cy="65" rx="18" ry="22" fill="#9b87f5" opacity="0.6" />
+              
+              <ellipse cx="40" cy="48" rx="6" ry="9" fill="#9b87f5" opacity="0.5" />
+              <ellipse cx="50" cy="45" rx="6" ry="9" fill="#9b87f5" opacity="0.5" />
+              <ellipse cx="60" cy="48" rx="6" ry="9" fill="#9b87f5" opacity="0.5" />
+              
+              <ellipse cx="37" cy="48" rx="3" ry="5" fill="#D946EF" opacity="0.4" />
+              <ellipse cx="47" cy="45" rx="3" ry="5" fill="#D946EF" opacity="0.4" />
+              <ellipse cx="57" cy="48" rx="3" ry="5" fill="#D946EF" opacity="0.4" />
+            </svg>
+          </div>
         </div>
       ))}
 
@@ -189,8 +172,35 @@ export default function BongoCat() {
           }
         }
 
+        @keyframes paw-print {
+          0% {
+            transform: scale(0.5);
+            opacity: 0;
+          }
+          10% {
+            transform: scale(1.2);
+            opacity: 0.8;
+          }
+          20% {
+            transform: scale(1);
+            opacity: 0.7;
+          }
+          70% {
+            transform: scale(1);
+            opacity: 0.7;
+          }
+          100% {
+            transform: scale(1.1);
+            opacity: 0;
+          }
+        }
+
         .animate-paw-strike {
           animation: paw-strike 2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .animate-paw-print {
+          animation: paw-print 3s ease-out forwards;
         }
       `}</style>
     </>
