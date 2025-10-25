@@ -8,6 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import BongoCat from '@/components/BongoCat';
 
 type Language = 'ru' | 'en';
 
@@ -245,7 +246,9 @@ export default function Index() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+    <>
+      <BongoCat />
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
       <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md shadow-sm z-50 animate-fade-in">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -548,5 +551,6 @@ export default function Index() {
         </div>
       </footer>
     </div>
+    </>
   );
 }
